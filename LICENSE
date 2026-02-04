@@ -1,0 +1,15 @@
+                    GNU GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+ Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+This software is based on Surge XT by the Surge Synth Team.
+Original source: https://github.com/surge-synthesizer/surge
+
+The Surge synthesizer was originally written and sold as a commercial
+product by Claes Johanson at Vember Audio. In September 2018, Claes
+released the source code under the GNU General Public License v3.
+
+See https://www.gnu.org/licenses/gpl-3.0.html for the full license text.

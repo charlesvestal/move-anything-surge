@@ -1,0 +1,3 @@
+[submodule "src/dsp/surge"]
+	path = src/dsp/surge
+	url = https://github.com/surge-synthesizer/surge.git

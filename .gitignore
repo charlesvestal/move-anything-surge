@@ -1,0 +1,7 @@
+build/
+build-test/
+dist/
+*.tar.gz
+.DS_Store
+# Symlink created by CMake for Surge's CMAKE_SOURCE_DIR/libs reference
+/libs

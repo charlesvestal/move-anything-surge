@@ -1,0 +1,94 @@
+{
+  "id": "surge",
+  "name": "Surge XT",
+  "abbrev": "SRG",
+  "version": "0.1.0",
+  "description": "Surge XT hybrid synthesizer - wavetable, FM, subtractive, and physical modeling",
+  "author": "Surge Synth Team (port: charlesvestal)",
+  "license": "GPL-3.0",
+  "ui": "ui.js",
+  "dsp": "dsp.so",
+  "api_version": 2,
+  "capabilities": {
+    "audio_out": true,
+    "audio_in": false,
+    "midi_in": true,
+    "midi_out": false,
+    "aftertouch": true,
+    "chainable": true,
+    "component_type": "sound_generator",
+    "chain_params": [
+      {
+        "key": "preset",
+        "name": "Preset",
+        "type": "int",
+        "min": 0,
+        "max_param": "preset_count",
+        "default": 0
+      },
+      {
+        "key": "cutoff",
+        "name": "Cutoff",
+        "type": "float",
+        "min": 0.0,
+        "max": 1.0,
+        "default": 0.7,
+        "step": 0.02
+      },
+      {
+        "key": "resonance",
+        "name": "Resonance",
+        "type": "float",
+        "min": 0.0,
+        "max": 1.0,
+        "default": 0.0,
+        "step": 0.02
+      },
+      {
+        "key": "filter_env",
+        "name": "Filter Env",
+        "type": "float",
+        "min": 0.0,
+        "max": 1.0,
+        "default": 0.0,
+        "step": 0.02
+      },
+      {
+        "key": "attack",
+        "name": "Attack",
+        "type": "float",
+        "min": 0.0,
+        "max": 1.0,
+        "default": 0.0,
+        "step": 0.02
+      },
+      {
+        "key": "decay",
+        "name": "Decay",
+        "type": "float",
+        "min": 0.0,
+        "max": 1.0,
+        "default": 0.5,
+        "step": 0.02
+      },
+      {
+        "key": "sustain",
+        "name": "Sustain",
+        "type": "float",
+        "min": 0.0,
+        "max": 1.0,
+        "default": 0.8,
+        "step": 0.02
+      },
+      {
+        "key": "release",
+        "name": "Release",
+        "type": "float",
+        "min": 0.0,
+        "max": 1.0,
+        "default": 0.3,
+        "step": 0.02
+      }
+    ]
+  }
+}

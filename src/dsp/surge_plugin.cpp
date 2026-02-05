@@ -421,7 +421,7 @@ static void* v2_create_instance(const char *module_dir, const char *json_default
     if (!inst) return nullptr;
 
     strncpy(inst->module_dir, module_dir, sizeof(inst->module_dir) - 1);
-    inst->output_gain = 0.15f;
+    inst->output_gain = 0.5f;
     snprintf(inst->preset_name, sizeof(inst->preset_name), "Init");
     inst->error_msg[0] = '\0';
 

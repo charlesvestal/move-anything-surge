@@ -122,6 +122,12 @@ typedef struct {
  * ===================================================================== */
 
 static void plugin_log(const char *msg) {
+    /* Always write to file for debugging */
+    FILE *f = fopen("/tmp/surge_debug.log", "a");
+    if (f) {
+        fprintf(f, "[surge] %s\n", msg);
+        fclose(f);
+    }
     if (g_host && g_host->log) {
         char buf[512];
         snprintf(buf, sizeof(buf), "[surge] %s", msg);
@@ -421,6 +427,19 @@ static void* v2_create_instance(const char *module_dir, const char *json_default
 
     char msg[256];
     snprintf(msg, sizeof(msg), "module_dir: %s", module_dir);
+    plugin_log(msg);
+
+    /* Redirect Surge's paths to a writable location on Move.
+     * Surge's sst-plugininfra uses HOME and XDG_DATA_HOME to find paths.
+     * Without this, it tries to access /home/root/ which doesn't exist or
+     * has wrong permissions on Move. We redirect both to ensure all path
+     * lookups (like ~/.Surge XT and ~/.local/share/...) go to writable dirs. */
+    char surge_home_path[512];
+    snprintf(surge_home_path, sizeof(surge_home_path),
+             "/data/UserData/move-anything/surge-config");
+    setenv("HOME", surge_home_path, 1);
+    setenv("XDG_DATA_HOME", surge_home_path, 1);
+    snprintf(msg, sizeof(msg), "Set HOME and XDG_DATA_HOME=%s", surge_home_path);
     plugin_log(msg);
 
     /* Create plugin layer */

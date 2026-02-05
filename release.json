@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
-  "download_url": "https://github.com/charlesvestal/move-anything-surge/releases/download/v0.1.0/surge-module.tar.gz",
+  "version": "0.1.1",
+  "download_url": "https://github.com/charlesvestal/move-anything-surge/releases/download/v0.1.1/surge-module.tar.gz",
   "install_path": "modules/sound_generators/surge"
 }

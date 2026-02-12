@@ -568,6 +568,7 @@ static void v2_set_param(void *instance, const char *key, const char *val) {
     /* State restore */
     if (strcmp(key, "state") == 0) {
         float fval;
+        /* Restore preset first (sets all engine params to preset values) */
         if (json_get_number(val, "preset", &fval) == 0) {
             int idx = (int)fval;
             if (idx >= 0 && idx < inst->preset_count) {
@@ -578,6 +579,14 @@ static void v2_set_param(void *instance, const char *key, const char *val) {
             inst->octave_transpose = (int)fval;
             if (inst->octave_transpose < -3) inst->octave_transpose = -3;
             if (inst->octave_transpose > 3) inst->octave_transpose = 3;
+        }
+        /* Restore all registered params (overrides preset values with saved tweaks) */
+        for (int i = 0; i < inst->param_count; i++) {
+            if (json_get_number(val, inst->params[i].key, &fval) == 0) {
+                if (fval < 0.0f) fval = 0.0f;
+                if (fval > 1.0f) fval = 1.0f;
+                inst->synth->setParameter01(inst->params[i].surge_id, fval);
+            }
         }
         return;
     }
@@ -627,11 +636,21 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
     if (strcmp(key, "octave_transpose") == 0)
         return snprintf(buf, buf_len, "%d", inst->octave_transpose);
 
-    /* State serialization */
+    /* State serialization — includes all registered params for full save/restore */
     if (strcmp(key, "state") == 0) {
-        return snprintf(buf, buf_len,
-            "{\"preset\":%d,\"octave_transpose\":%d}",
+        int offset = 0;
+        offset += snprintf(buf + offset, buf_len - offset,
+            "{\"preset\":%d,\"octave_transpose\":%d",
             inst->current_preset, inst->octave_transpose);
+
+        for (int i = 0; i < inst->param_count && offset < buf_len - 60; i++) {
+            float v = inst->synth->getParameter01(inst->params[i].surge_id);
+            offset += snprintf(buf + offset, buf_len - offset,
+                ",\"%s\":%.6f", inst->params[i].key, v);
+        }
+
+        offset += snprintf(buf + offset, buf_len - offset, "}");
+        return offset;
     }
 
     /* Pre-built JSON responses */
@@ -650,11 +669,7 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
     surge_param_entry *entry = find_param(inst, key);
     if (entry) {
         float v = inst->synth->getParameter01(entry->surge_id);
-        if (entry->valtype == 2) {
-            return snprintf(buf, buf_len, "%.4f", v);
-        } else {
-            return snprintf(buf, buf_len, "%d", (int)(v + 0.5f));
-        }
+        return snprintf(buf, buf_len, "%.6f", v);
     }
 
     return -1;

@@ -262,7 +262,8 @@ static void build_ui_hierarchy(surge_instance_t *inst) {
                     "{\"level\":\"lfo1\",\"label\":\"LFO 1\"},"
                     "{\"level\":\"lfo2\",\"label\":\"LFO 2\"},"
                     "{\"level\":\"lfo3\",\"label\":\"LFO 3\"},"
-                    "{\"level\":\"scene\",\"label\":\"Scene\"}"
+                    "{\"level\":\"scene\",\"label\":\"Scene\"},"
+                    "{\"level\":\"mpe\",\"label\":\"MPE\"}"
                 "]"
             "},"
             "\"osc1\":{"
@@ -372,6 +373,11 @@ static void build_ui_hierarchy(surge_instance_t *inst) {
                     "\"pbrange_up\",\"pbrange_dn\","
                     "\"send_fx_1\",\"send_fx_2\",\"send_fx_3\",\"send_fx_4\","
                     "\"octave_transpose\"]"
+            "},"
+            "\"mpe\":{"
+                "\"children\":null,"
+                "\"knobs\":[\"mpe_enabled\",\"mpe_pitch_bend_range\"],"
+                "\"params\":[\"mpe_enabled\",\"mpe_pitch_bend_range\"]"
             "}"
         "}"
         "}");
@@ -387,7 +393,9 @@ static void build_chain_params(surge_instance_t *inst) {
     int offset = 0;
     offset += snprintf(inst->chain_params_json + offset, bufsize - offset,
         "[{\"key\":\"preset\",\"name\":\"Preset\",\"type\":\"int\",\"min\":0,\"max\":9999}"
-        ",{\"key\":\"octave_transpose\",\"name\":\"Octave\",\"type\":\"int\",\"min\":-3,\"max\":3}");
+        ",{\"key\":\"octave_transpose\",\"name\":\"Octave\",\"type\":\"int\",\"min\":-3,\"max\":3}"
+        ",{\"key\":\"mpe_enabled\",\"name\":\"MPE Enabled\",\"type\":\"int\",\"min\":0,\"max\":1}"
+        ",{\"key\":\"mpe_pitch_bend_range\",\"name\":\"MPE PB Range\",\"type\":\"int\",\"min\":1,\"max\":96}");
 
     for (int i = 0; i < inst->param_count && offset < bufsize - 200; i++) {
         const char *type_str = (inst->params[i].valtype == 2) ? "float" :
@@ -580,6 +588,15 @@ static void v2_set_param(void *instance, const char *key, const char *val) {
             if (inst->octave_transpose < -3) inst->octave_transpose = -3;
             if (inst->octave_transpose > 3) inst->octave_transpose = 3;
         }
+        if (json_get_number(val, "mpe_enabled", &fval) == 0) {
+            inst->synth->mpeEnabled = ((int)fval > 0);
+        }
+        if (json_get_number(val, "mpe_pitch_bend_range", &fval) == 0) {
+            int range = (int)fval;
+            if (range < 1) range = 1;
+            if (range > 96) range = 96;
+            inst->synth->storage.mpePitchBendRange = (float)range;
+        }
         /* Restore all registered params (overrides preset values with saved tweaks) */
         for (int i = 0; i < inst->param_count; i++) {
             if (json_get_number(val, inst->params[i].key, &fval) == 0) {
@@ -609,6 +626,24 @@ static void v2_set_param(void *instance, const char *key, const char *val) {
         inst->synth->allNotesOff();
         return;
     }
+    if (strcmp(key, "mpe_enabled") == 0) {
+        bool enable = atoi(val) > 0;
+        inst->synth->mpeEnabled = enable;
+        char msg[128];
+        snprintf(msg, sizeof(msg), "MPE %s", enable ? "enabled" : "disabled");
+        plugin_log(msg);
+        return;
+    }
+    if (strcmp(key, "mpe_pitch_bend_range") == 0) {
+        int range = atoi(val);
+        if (range < 1) range = 1;
+        if (range > 96) range = 96;
+        inst->synth->storage.mpePitchBendRange = (float)range;
+        char msg[128];
+        snprintf(msg, sizeof(msg), "MPE pitch bend range = %d semitones", range);
+        plugin_log(msg);
+        return;
+    }
 
     /* Generic Surge parameter access */
     surge_param_entry *entry = find_param(inst, key);
@@ -635,13 +670,19 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
         return snprintf(buf, buf_len, "Surge XT");
     if (strcmp(key, "octave_transpose") == 0)
         return snprintf(buf, buf_len, "%d", inst->octave_transpose);
+    if (strcmp(key, "mpe_enabled") == 0)
+        return snprintf(buf, buf_len, "%d", inst->synth ? (int)inst->synth->mpeEnabled : 0);
+    if (strcmp(key, "mpe_pitch_bend_range") == 0)
+        return snprintf(buf, buf_len, "%d", inst->synth ? (int)inst->synth->storage.mpePitchBendRange : 48);
 
     /* State serialization — includes all registered params for full save/restore */
     if (strcmp(key, "state") == 0) {
         int offset = 0;
         offset += snprintf(buf + offset, buf_len - offset,
-            "{\"preset\":%d,\"octave_transpose\":%d",
-            inst->current_preset, inst->octave_transpose);
+            "{\"preset\":%d,\"octave_transpose\":%d,\"mpe_enabled\":%d,\"mpe_pitch_bend_range\":%d",
+            inst->current_preset, inst->octave_transpose,
+            inst->synth ? (int)inst->synth->mpeEnabled : 0,
+            inst->synth ? (int)inst->synth->storage.mpePitchBendRange : 48);
 
         for (int i = 0; i < inst->param_count && offset < buf_len - 60; i++) {
             float v = inst->synth->getParameter01(inst->params[i].surge_id);

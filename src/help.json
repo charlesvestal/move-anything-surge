@@ -171,6 +171,38 @@
         "Octave transpose:",
         " -3 to +3 octaves"
       ]
+    },
+    {
+      "title": "MPE Setup",
+      "lines": [
+        "For MPE controllers",
+        "(LinnStrument, Roli,",
+        "Sensel, etc):",
+        "",
+        "1. Set Receive Ch",
+        "   to ALL",
+        "2. Set Forward Ch",
+        "   to THRU",
+        "3. Enable MPE in",
+        "   Surge settings",
+        "",
+        "Receive=ALL lets all",
+        "MPE channels through.",
+        "Forward=THRU keeps",
+        "per-note channel data",
+        "intact.",
+        "",
+        "MPE presets are in",
+        "the factory library",
+        "under MPE and in",
+        "Third Party >",
+        "LinnStrument MPE.",
+        "",
+        "These presets have",
+        "pressure, slide, and",
+        "timbre already routed",
+        "to synth parameters."
+      ]
     }
   ]
 }

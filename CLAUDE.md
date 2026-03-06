@@ -54,10 +54,30 @@ Currently exposes a subset of Surge's ~766 parameters focused on Scene A:
 - `filter_env` - Filter envelope amount
 - `octave_transpose` - Plugin-level octave shift
 
+### MPE Support
+
+Surge XT has full MPE (MIDI Polyphonic Expression) support:
+- `mpe_enabled` / `mpe_pitch_bend_range` params control MPE mode
+- Auto-detection via RPN 0,6 (MPE Configuration Message) — when an MPE controller
+  like LinnStrument sends its MCM, Surge enables MPE automatically
+- Per-note pitch bend, channel pressure, and CC74 (timbre/slide) are routed
+  to per-voice modulation when MPE is active
+
+**Important**: For MPE to work on Move, the chain slot must be configured:
+1. Receive Channel = All (so all MPE member channels reach the synth)
+2. Forward Channel = THRU (so per-channel data isn't remapped to one channel)
+
+Without this, the slot's channel remapping destroys MPE data before it reaches Surge.
+
+Factory and third-party MPE presets are included:
+- `patches_factory/MPE/` — 9 factory MPE patches
+- `patches_3rdparty/LinnStrument MPE/` — 63 Roger Linn MPE patches across 12 categories
+
 ### Preset Management
 
 Surge patches are loaded from the factory data bundled in `surge-data/`.
 Patches are browsed by index using preset/preset_count/preset_name params.
+Third-party patches (including LinnStrument MPE) are in `patches_3rdparty/`.
 
 ### Dependencies (via submodules)
 

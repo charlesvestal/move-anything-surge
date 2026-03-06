@@ -77,9 +77,11 @@ if [ -d "src/dsp/surge/resources/data" ]; then
         rm -rf dist/surge/surge-data/patches_factory/Tutorials   # Requires Lua (Formula Modulator)
         rm -rf dist/surge/surge-data/patches_factory/Templates   # Audio In / Init templates
     fi
-    # Copy third-party patches (includes LinnStrument MPE presets)
-    if [ -d "src/dsp/surge/resources/data/patches_3rdparty" ]; then
-        cp -r src/dsp/surge/resources/data/patches_3rdparty dist/surge/surge-data/
+    # Copy LinnStrument MPE presets from third-party patches
+    if [ -d "src/dsp/surge/resources/data/patches_3rdparty/LinnStrument MPE" ]; then
+        mkdir -p "dist/surge/surge-data/patches_3rdparty"
+        cp -r "src/dsp/surge/resources/data/patches_3rdparty/LinnStrument MPE" \
+              "dist/surge/surge-data/patches_3rdparty/"
     fi
     # Copy wavetables
     if [ -d "src/dsp/surge/resources/data/wavetables" ]; then

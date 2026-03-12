@@ -21,7 +21,7 @@ Wavetable, FM, subtractive, and physical modeling synthesis with 600+ factory pr
 
 ## Prerequisites
 
-- [Move Everything](https://github.com/charlesvestal/move-anything) installed on your Ableton Move
+- [Move Everything](https://github.com/charlesvestal/move-everything) installed on your Ableton Move
 - SSH access enabled: http://move.local/development/ssh
 
 ## Install
@@ -38,7 +38,7 @@ Wavetable, FM, subtractive, and physical modeling synthesis with 600+ factory pr
 Requires Docker (recommended) or ARM64 cross-compiler.
 
 ```bash
-git clone --recursive https://github.com/charlesvestal/move-anything-surge
+git clone --recursive https://github.com/charlesvestal/move-everything-surge
 cd move-anything-surge
 ./scripts/build.sh
 ./scripts/install.sh
